@@ -10,7 +10,7 @@ beforeEach(() => {
 
 describe('Testes unitários do recommendations service', () => {
 
-    it('Deve criar uma recomendação', async () => {
+    it('(insert) Deve criar uma recomendação', async () => {
         const recommendation = await recommendationFactory();
 
         jest
@@ -27,7 +27,7 @@ describe('Testes unitários do recommendations service', () => {
         expect(recommendationRepository.create).toBeCalled();
     });
 
-    it('Não deve criar uma recomendação duplicada', async () => {
+    it('(insert) Não deve criar uma recomendação duplicada', async () => {
         const recommendation = await recommendationFactory();
 
         jest
@@ -44,37 +44,99 @@ describe('Testes unitários do recommendations service', () => {
           });
         expect(recommendationRepository.create).not.toBeCalled();
     });
-
-    it('Deve retornar a recomendação', async () => {
+    
+    it('(getByIdOrFail) Deve retornar a recomendação encontrada por id', async () => {
         const recommendation = await fullRecommendationFactory();
-
+        
         jest
         .spyOn(recommendationRepository, 'find')
         .mockImplementationOnce((): any => {
             return recommendation
         });
-
+        
         const result = await recommendationService.getById(recommendation.id);
         
         expect(result).toEqual(recommendation);
     });
-
-    it('Deve dar erro not_found com id não existente', async () => {
+    
+    it('(getByIdOrFail) Deve dar erro not_found com id não existente', async () => {
         const recommendation = await fullRecommendationFactory();
-
+        
         jest
         .spyOn(recommendationRepository, 'find')
         .mockImplementationOnce((): any => {});
-
+        
         const promise = recommendationService.getById(recommendation.id);
-
+        
         expect(promise).rejects.toEqual({
             type: 'not_found',
             message: ''
         });
     });
+    
+    it('(upvote) Deve atualizar o score da recomendação', async () => {
+        const recommendation = await fullRecommendationFactory();
 
-    it('Deve retorna as recomendações', async () => {
+        jest
+        .spyOn(recommendationRepository, 'find')
+        .mockImplementationOnce((): any => {return recommendation});
+
+        jest
+        .spyOn(recommendationRepository, 'updateScore')
+        .mockImplementationOnce((): any => {});
+
+        await recommendationService.upvote(recommendation.id);
+
+        expect(recommendationRepository.updateScore).toBeCalled();
+    });
+
+    it('(downvote) Deve atualizar o score da recomendação', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'find')
+        .mockImplementationOnce((): any => {return recommendation});
+
+        jest
+        .spyOn(recommendationRepository, 'updateScore')
+        .mockImplementationOnce((): any => {return recommendation});
+
+        await recommendationService.downvote(recommendation.id);
+
+        expect(recommendationRepository.updateScore).toBeCalled();
+    });
+
+    it('(downvote) Deve apagar o score da recomendação quando ficar abaixo de -5', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'find')
+        .mockImplementationOnce((): any => {
+            return {
+                ...recommendation,
+                score: -5
+            }
+        });
+
+        jest
+        .spyOn(recommendationRepository, 'updateScore')
+        .mockImplementationOnce((): any => {
+            return {
+                ...recommendation,
+                score: -6
+            }
+        });
+
+        jest
+        .spyOn(recommendationRepository, 'remove')
+        .mockImplementationOnce((): any => {});
+
+        await recommendationService.downvote(recommendation.id);
+
+        expect(recommendationRepository.remove).toBeCalled();
+    });
+
+    it('(get) Deve retorna as recomendações', async () => {
         const recommendation = await fullRecommendationFactory();
 
         jest
@@ -88,7 +150,7 @@ describe('Testes unitários do recommendations service', () => {
         expect(recommendationRepository.findAll).toBeCalled();
     });
 
-    it('Deve retorna as recomendações', async () => {
+    it('(getTop) Deve retorna as top recomendações', async () => {
         const recommendation = await fullRecommendationFactory();
 
         jest
