@@ -42,6 +42,23 @@ describe('GET /recommendations', () => {
     });
 });
 
+describe('GET /recommendations/:id', () => {
+    
+    it('Em caso de sucesso deve retornar a recomendação', async () => {
+        const recommendation = await createRecommendationData();
+        const findRecommendation = await supertest(app).get(`/recommendations/${recommendation.id}`).send();
+
+        expect(recommendation).toEqual(findRecommendation.body);
+    });
+
+    it('Em caso de id não existente deve retornar status 404', async () => {
+        const result = await supertest(app).get(`/recommendations/1`).send();
+        const status = result.status;
+
+        expect(status).toBe(404);
+    });
+});
+
 afterAll(async () => {
     await prisma.$disconnect();
 });
