@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { prisma } from "../../src/database";
-import { createRecommendationData, createSeveralRecommendationsData, recommendationFactory } from "../factories/recommendationFactory";
+import { createRecommendationData, createSeveralRecommendationsData, getRandomInteger, recommendationFactory } from "../factories/recommendationFactory";
 import { deleteAllData } from "../factories/scenarioFactory";
 
 beforeEach(async () => {
@@ -52,7 +52,24 @@ describe('GET /recommendations/:id', () => {
     });
 
     it('Em caso de id não existente deve retornar status 404', async () => {
-        const result = await supertest(app).get(`/recommendations/1`).send();
+        const result = await supertest(app).get(`/recommendations/${getRandomInteger(1, 20)}`).send();
+        const status = result.status;
+
+        expect(status).toBe(404);
+    });
+});
+
+describe('GET /recommendations/random', () => {
+    
+    it('Em caso de sucesso deve retornar uma recomendação', async () => {
+        await createSeveralRecommendationsData();
+        const result = await supertest(app).get(`/recommendations/random`).send();
+
+        expect(result.body).not.toBeFalsy();
+    });
+
+    it('Em caso de não existentir música cadastrada deve retornar status 404', async () => {
+        const result = await supertest(app).get(`/recommendations/random`).send();
         const status = result.status;
 
         expect(status).toBe(404);

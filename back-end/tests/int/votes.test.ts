@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { prisma } from "../../src/database";
-import { createBadRecommendationData, createRecommendationData } from "../factories/recommendationFactory";
+import { createBadRecommendationData, createRecommendationData, getRandomInteger } from "../factories/recommendationFactory";
 import { deleteAllData } from "../factories/scenarioFactory";
 
 beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('POST /recommendations/:id/upvote', () => {
     });
 
     it('Em caso de id inexistente deve retornar 404', async () => {
-        const result = await supertest(app).post(`/recommendations/1/upvote`).send();
+        const result = await supertest(app).post(`/recommendations/${getRandomInteger(1, 20)}/upvote`).send();
         const status = result.status;
         
         expect(status).toBe(404);
@@ -41,7 +41,7 @@ describe('POST /recommendations/:id/downvote', () => {
     });
 
     it('Em caso de id inexistente deve retornar 404', async () => {
-        const result = await supertest(app).post(`/recommendations/1/upvote`).send();
+        const result = await supertest(app).post(`/recommendations/${getRandomInteger(1, 20)}/upvote`).send();
         const status = result.status;
         
         expect(status).toBe(404);

@@ -18,7 +18,6 @@ describe('GET /recommendations/top/:amount', () => {
 
         expect(result.body).toHaveLength(amount);
         expect(result.body[0]).toEqual(sortRecommendations[0]);
-        expect(result.body[amount - 1]).toEqual(sortRecommendations[amount - 1]);
     });
 });
 
