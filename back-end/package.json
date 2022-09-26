@@ -5,8 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:int": "npx dotenv-cli -e .env.test jest -- -i",
-    "test:unit": "dotenv -e .env.test jest -- -i --coverage",
+    "test:int": "npx dotenv-cli -e .env.test jest -- -i --testPathPattern=tests/int",
+    "test:unit": "dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/unit",
     "dev": "nodemon src/server.ts"
   },
   "keywords": [],
