@@ -59,7 +59,7 @@ describe('Testes unitários do recommendations service', () => {
         expect(result).toEqual(recommendation);
     });
 
-    it('Deve dar erro not_found', async () => {
+    it('Deve dar erro not_found com id não existente', async () => {
         const recommendation = await fullRecommendationFactory();
 
         jest
@@ -72,5 +72,33 @@ describe('Testes unitários do recommendations service', () => {
             type: 'not_found',
             message: ''
         });
+    });
+
+    it('Deve retorna as recomendações', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockImplementationOnce((): any => {
+            return recommendation
+        });
+
+        await recommendationService.get();
+        
+        expect(recommendationRepository.findAll).toBeCalled();
+    });
+
+    it('Deve retorna as recomendações', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'getAmountByScore')
+        .mockImplementationOnce((): any => {
+            return recommendation
+        });
+
+        await recommendationService.getTop(5);
+        
+        expect(recommendationRepository.getAmountByScore).toBeCalled();
     });
 });
