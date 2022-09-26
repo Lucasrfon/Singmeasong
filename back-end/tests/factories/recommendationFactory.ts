@@ -8,6 +8,15 @@ export async function recommendationFactory() {
   }
 }
 
+export async function fullRecommendationFactory() {
+  return {
+    id: getRandomInteger(1, 10),
+    name: faker.lorem.words(4),
+    youtubeLink: 'https://www.youtube.com/watch?v=65Th0jPbsrE',
+    score: getRandomInteger(-5, 50)
+  }
+}
+
 export async function createRecommendationData() {
   const recommendation = await prisma.recommendation.create({
     data: {

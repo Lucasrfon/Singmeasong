@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 import { recommendationRepository } from '../../src/repositories/recommendationRepository';
 import { recommendationService } from '../../src/services/recommendationsService';
-import { recommendationFactory } from '../factories/recommendationFactory';
+import { fullRecommendationFactory, getRandomInteger, recommendationFactory } from '../factories/recommendationFactory';
 
 beforeEach(() => {
     jest.resetAllMocks();
@@ -43,5 +43,34 @@ describe('Testes unitários do recommendations service', () => {
             message: 'Recommendations names must be unique'
           });
         expect(recommendationRepository.create).not.toBeCalled();
+    });
+
+    it('Deve retornar a recomendação', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'find')
+        .mockImplementationOnce((): any => {
+            return recommendation
+        });
+
+        const result = await recommendationService.getById(recommendation.id);
+        
+        expect(result).toEqual(recommendation);
+    });
+
+    it('Deve dar erro not_found', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'find')
+        .mockImplementationOnce((): any => {});
+
+        const promise = recommendationService.getById(recommendation.id);
+
+        expect(promise).rejects.toEqual({
+            type: 'not_found',
+            message: ''
+        });
     });
 });
