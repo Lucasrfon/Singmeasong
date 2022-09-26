@@ -163,4 +163,57 @@ describe('Testes unitários do recommendations service', () => {
         
         expect(recommendationRepository.getAmountByScore).toBeCalled();
     });
+
+    it('(getRandom) Deve retorna ao menos uma recomendação ao encontrar filtrando pelo score', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockImplementationOnce((): any => {
+            return [recommendation]
+        });
+
+        const result = await recommendationService.getRandom();
+        
+        expect(result).toEqual(recommendation);
+    });
+
+    it('(getRandom) Deve retorna ao menos uma recomendação ao não encontrar pelo score, mas existir', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockImplementationOnce((): any => {
+            return []
+        });
+
+        jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockImplementationOnce((): any => {
+            return [recommendation]
+        });
+
+        const result = await recommendationService.getRandom();
+        
+        expect(result).toEqual(recommendation);
+    });
+
+    it('(getRandom) Deve dar erro not_found quando não existirem recomandações', async () => {
+        const recommendation = await fullRecommendationFactory();
+
+        jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockImplementationOnce((): any => { return [] });
+
+        jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockImplementationOnce((): any => { return [] });
+
+        const promise = recommendationService.getRandom();
+        
+        expect(promise).rejects.toEqual({
+            type: 'not_found',
+            message: ''
+        });
+    });
 });
