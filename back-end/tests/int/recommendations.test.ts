@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 import { prisma } from "../../src/database";
-import { createRecommendationData, recommendationFactory } from "../factories/recommendationFactory";
+import { createRecommendationData, createSeveralRecommendationsData, recommendationFactory } from "../factories/recommendationFactory";
 import { deleteAllData } from "../factories/scenarioFactory";
 
 beforeEach(async () => {
@@ -28,6 +28,17 @@ describe('POST /recommendations', () => {
 
         expect(status).toBe(409);
         expect(recommendation).toHaveLength(1);
+    });
+});
+
+describe('GET /recommendations', () => {
+    
+    it('Em caso de sucesso deve retornar as 10 últimas recomendações', async () => {
+        const recommendations = await createSeveralRecommendationsData();
+        const result = await supertest(app).get("/recommendations").send();
+
+        expect(result.body).toHaveLength(10);
+        expect(recommendations[recommendations.length - 1]).toEqual(result.body[0]);
     });
 });
 

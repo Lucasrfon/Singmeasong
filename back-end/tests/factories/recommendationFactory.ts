@@ -19,6 +19,20 @@ export async function createRecommendationData() {
   return recommendation;
 }
 
+export async function createSeveralRecommendationsData() {
+  const recommendation = []
+  for(let i = 0; i < 15; i++) {
+    recommendation[i] = await prisma.recommendation.create({
+      data: {
+        name: faker.lorem.words(4),
+        youtubeLink: 'https://www.youtube.com/watch?v=65Th0jPbsrE'
+      }
+    });
+  }
+    
+  return recommendation;
+}
+
 export async function createBadRecommendationData() {
   const recommendation = await prisma.recommendation.create({
     data: {
