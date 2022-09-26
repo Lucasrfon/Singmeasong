@@ -7,7 +7,7 @@
   "scripts": {
     "test:int": "npx dotenv-cli -e .env.test jest -- -i --testPathPattern=tests/int",
     "test:unit": "dotenv -e .env.test jest -- -i --coverage --testPathPattern=tests/unit",
-    "dev": "nodemon src/server.ts"
+    "dev": "dotenv -e .env.test nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
